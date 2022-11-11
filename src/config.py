@@ -1,0 +1,9 @@
+import os
+
+DEFAULT_ZIP_DIR = os.getenv('DEFAULT_ZIP_DIR', 'result_zip')
+DEFAULT_ZIP_COUNT = os.getenv('DEFAULT_ZIP_COUNT', 50)
+DEFAULT_XML_PER_ZIP_COUNT = os.getenv('DEFAULT_XML_PER_ZIP_COUNT', 100)
+
+DEFAULT_CSV_DIR = os.getenv('DEFAULT_CSV_DIR', 'result_csv')
+DEFAULT_ID_LEVEL_CSV_FILENAME = os.getenv('DEFAULT_FIRST_CSV_FILENAME', 'id_level.csv')
+DEFAULT_ID_OBJECT_CSV_FILENAME = os.getenv('DEFAULT_SECOND_CSV_FILENAME', 'id_object.csv')
