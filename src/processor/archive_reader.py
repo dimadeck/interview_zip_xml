@@ -1,5 +1,7 @@
+import multiprocessing
 import os
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Optional, Union
 
@@ -12,6 +14,7 @@ class ArchiveReader:
     OUTPUT_DIR = DEFAULT_CSV_DIR
     ID_LEVEL_FILENAME = os.path.join(DEFAULT_CSV_DIR, DEFAULT_ID_LEVEL_CSV_FILENAME)
     ID_OBJECT_FILENAME = os.path.join(DEFAULT_CSV_DIR, DEFAULT_ID_OBJECT_CSV_FILENAME)
+    MAX_WORKERS = multiprocessing.cpu_count()
     """
     Обрабатывает директорию с полученными zip архивами, разбирает вложенные xml файлы и формирует 2 csv файла:
         Первый: id, level - по одной строке на каждый xml файл
@@ -26,11 +29,12 @@ class ArchiveReader:
         self._id_object_generator = IDObjectGenerator(id_object_filename or self.ID_OBJECT_FILENAME)
 
     def execute(self):
-        for filename in os.listdir(self._input_dir):
-            zip_filename = os.path.join(self._input_dir, filename)
-            if not self._check_zip(zip_filename):
-                continue
-            self._handle_zip(zip_filename)
+        with ThreadPoolExecutor(self.MAX_WORKERS) as executor:
+            for filename in os.listdir(self._input_dir):
+                zip_filename = os.path.join(self._input_dir, filename)
+                if not self._check_zip(zip_filename):
+                    continue
+                executor.submit(self._handle_zip, zip_filename=zip_filename)
         self._id_level_generator.save()
         self._id_object_generator.save()
 
